@@ -1,0 +1,20 @@
+import wollok.game.*
+import detectives.*
+import objetos.*
+import interacciones.*
+import restoPersonajes.*
+import directorJuego.*
+import dialogos.*
+import controles.*
+import debug.*
+import instancias.*
+import animaciones.*
+
+
+program juego {
+    configuracion.configurarCanvas()
+
+    cinematicas.comenzar()
+
+    game.start()
+}

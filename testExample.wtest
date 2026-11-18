@@ -1,9 +1,90 @@
-import example.pepita
+import wollok.game.*
+import detectives.*
+import colisiones.*
+import cuadroDeTexto.*
+import habitaciones.*
+import interacciones.*
+import objetos.*
+import restoPersonajes.*
+import dialogos.*
+import menu.*
+import instancias.*
 
-describe "group of tests for pepita" {
+describe "1. Movimiento básico de Patricio Juan" {
+    test "Patricio arranca en la posición inicial 7,9" {
+        assert.equals(game.at(7,9), patricioJuan.position())
+    }
+}
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
-  }
+describe "2. Menú de Pistas e Inventario" {
+    method initialize() {
+        menu.reiniciar()
+    }
+    
+    test "Al inicio no hay ninguna pista guardada en el menú" {
+        assert.that(menu.pistas().isEmpty())
+    }
+    
+    test "Guardar una pista hace que el menú la contenga" {
+        menu.guardarPista(acreditacion)
+        assert.that(menu.tieneTodas([acreditacion]))
+    }
+    
+    test "El método tieneTodas falla si nos falta alguna pista de la lista" {
+        menu.guardarPista(acreditacion)
+        assert.notThat(menu.tieneTodas([acreditacion, llaveVestuario]))
+    }
+}
 
+describe "3. Humor y Estados de Ánimo de Sospechosos" {
+    method initialize() {
+        tesorero.reiniciar()
+    }
+    
+    test "Un sospechoso arranca siempre con estado de ánimo relajado" {
+        assert.equals(relajado, tesorero.estadoDeAnimo())
+    }
+    
+    test "Usar un tono provocador baja el humor y lo deja acorralado" {
+        provocador.afectar(tesorero)
+        assert.equals(acorralado, tesorero.estadoDeAnimo())
+    }
+    
+    test "Usar un tono gentil sube el humor y lo mantiene relajado" {
+        gentil.afectar(tesorero)
+        assert.equals(relajado, tesorero.estadoDeAnimo())
+    }
+}
+
+describe "4. Interacciones simples con Muebles" {
+    method initialize() {
+        menu.reiniciar()
+        cajaFuerte.reiniciar()
+    }
+    
+    test "Revisar la caja fuerte otorga la llave del auto rojo" {
+        cajaFuerte.usar(patricioJuan)
+        assert.that(menu.tieneTodas([llaveAutoRojo]))
+    }
+    
+    test "Revisar un mueble con pista por segunda vez NO duplica la pista" {
+        cajaFuerte.usar(patricioJuan)
+        cuadros.cerrar() 
+        cajaFuerte.usar(patricioJuan)
+        
+        assert.equals(1, menu.pistas().size())
+    }
+}
+
+describe "5. Interacciones con Informantes" {
+    method initialize() {
+        menu.reiniciar()
+        recepcionista.reiniciar()
+    }
+    
+    test "Al finalizar de hablar con el informante, este te entrega la pista" {
+        recepcionista.interactuar(patricioJuan) 
+        recepcionista.finalizarInteraccion() 
+        assert.that(menu.tieneTodas([acreditacion]))
+    }
 }
